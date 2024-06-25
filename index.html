@@ -30,6 +30,7 @@
                                     type="text"
                                     class="form-control"
                                     id="txtMaSV"
+                                    data-validation="doDai"
                                 />
                                 <span id="spanMaSV" class="text-danger"></span>
                             </div>
@@ -39,6 +40,7 @@
                                     type="text"
                                     class="form-control"
                                     id="txtTenSV"
+                                    data-validation="doDai"
                                 />
                                 <span id="spanTenSV" class="text-danger"></span>
                             </div>
@@ -50,6 +52,7 @@
                                     type="text"
                                     class="form-control"
                                     id="txtEmail"
+                                    data-validation="email"
                                 />
                                 <span
                                     id="spanEmailSV"
@@ -62,6 +65,7 @@
                                     type="password"
                                     class="form-control"
                                     id="txtPass"
+                                    data-validation="doDai"
                                 />
                                 <span
                                     id="spanMatKhau"
@@ -207,7 +211,8 @@
             type="text/javascript"
             src="https://cdn.jsdelivr.net/npm/toastify-js"
         ></script>
-
+        <script src="./util/util.js"></script>
+        <script src="./validation/validation.js"></script>
         <script src="./models/SinhVien.js"></script>
         <script src="./js/index.js"></script>
     </body>

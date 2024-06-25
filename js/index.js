@@ -14,19 +14,55 @@ renderSinhVien();
 
 //get value sinh viên
 function getValueSinhVien() {
-    //lấy ra tất cả input select trong form
+    // sử dụng querySelectorAll
     let arrField = document.querySelectorAll(
         "#formQLSV input, #formQLSV select"
     );
-    //khởi tạo 1 đối tượng sv
-    let sv = new SinhVien();
+    // khởi tạo một đối tượng từ lớp đối tượng SinhVien
+    let sinhVien = new SinhVien();
+    let isValid = true;
+    // Phép toán nhị phân true (1), false(0)
+    // true & false ==> 1 & 0 ==> 0(false)
+    // true & true ==> 1 & 1 ==> 1 (true)
 
-    for (let tag of arrField) {
-        //destructoring
-        let { value, id } = tag;
-        sv[id] = value;
+    for (let field of arrField) {
+        // destructuring
+        let { value, id } = field; // txtMaSV // txtTenSV
+        // thực hiện lấy data-attribute của input
+        let dataValidation = field.getAttribute("data-validation");
+        console.log(dataValidation);
+        sinhVien[id] = value;
+
+        // Thực hiện validation dữ liệu người dùng
+        // Thực hiện từ lệnh DOM đang có tới các input và select, sẽ sử dụng phương thức parentElement để DOM tới thẻ cha gần nhất
+        let theCha = field.parentElement;
+        let theSpanThongBao = theCha.querySelector("span");
+        // console.log(theCha.querySelector("span"));
+
+        let isEmpty = checkEmptyValue(value, theSpanThongBao); // true false
+        isValid &= isEmpty;
+        // xử lí nếu dữ liệu rỗng thì sẽ không xử lí bất kỳ hành động nào bên dưới
+        if (!isEmpty) {
+            continue;
+        }
+        // if (id == "txtTenSV") {
+        //   isValid &= checkMinMaxValue(value, theSpanThongBao, 6, 10);
+        // }
+        // if (id == "txtEmail") {
+        //   isValid &= checkEmailValue(value, theSpanThongBao);
+        // }
+        if (dataValidation == "doDai") {
+            isValid &= checkMinMaxValue(value, theSpanThongBao, 6, 10);
+        } else if (dataValidation == "email") {
+            isValid &= checkEmailValue(value, theSpanThongBao);
+        }
     }
-    return sv;
+
+    // thực hiện kiểm tra nếu isValid mang giá trị false thì return và không trả về sinhVien
+    if (!isValid) {
+        return;
+    }
+    return sinhVien;
 }
 //đồng bộ dữ liệu
 function syncData() {
@@ -206,6 +242,29 @@ function hienThiThongBao(text, duration, className) {
         backgroundColor: "red",
     }).showToast();
 }
+
+// Tìm kiếm sinh viên
+document.getElementById("txtSearch").oninput = function (event) {
+    // console.log(event.target.value); // â ==> a
+    // sản phẩm = "Nồi cơm điện" ==> "Noi com dien" ==> 'noi com dien'
+    // keyword = '   noi com dien   ' ==> "   noi com dien   " ==> 'noi com dien'
+    let newKeyWord = removeVietnameseTones(event.target.value)
+        .trim()
+        .toLowerCase();
+    // console.log(newKeyWord);
+
+    // includes "noi com dien" | "dien"
+    // console.log("noi com dien".includes("di")); // true | false
+    // tên sản phẩm .includes(newKeyWord) ==> true | false
+    let arrFilter = arrSinhVien.filter((item, index) => {
+        let newTenSV = removeVietnameseTones(item.txtTenSV)
+            .trim()
+            .toLowerCase();
+        console.log(item);
+        return newTenSV.includes(newKeyWord);
+    });
+    console.log(arrFilter);
+};
 
 //xử lí thông báo với Toastify lib
 // Toastify({
