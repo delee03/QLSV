@@ -7,7 +7,8 @@
  * Lưu và lấy dữ liệu được lưu trữ ở localStorage
  * Validation dữ liệu người dùng nhập (Ràng buộc)
  * Tìm kiếm sinh viên
- *
+ *Nếu kiểm tra về độ dài thì sẽ có 1 chuỗi data attribute= "doDai"
+ *nếu kiểm tra về email thì sẽ có 1 data attribute = "email"
  */
 let arrSinhVien = getLocalStorage();
 renderSinhVien();
@@ -21,7 +22,8 @@ function getValueSinhVien() {
     // khởi tạo một đối tượng từ lớp đối tượng SinhVien
     let sinhVien = new SinhVien();
     let isValid = true;
-    // Phép toán nhị phân true (1), false(0)
+
+    // Phép toán nhị phân true (1), false(0) AND
     // true & false ==> 1 & 0 ==> 0(false)
     // true & true ==> 1 & 1 ==> 1 (true)
 
@@ -52,7 +54,7 @@ function getValueSinhVien() {
         //   isValid &= checkEmailValue(value, theSpanThongBao);
         // }
         if (dataValidation == "doDai") {
-            isValid &= checkMinMaxValue(value, theSpanThongBao, 6, 10);
+            isValid &= checkMinMaxValue(value, theSpanThongBao, 6, 15);
         } else if (dataValidation == "email") {
             isValid &= checkEmailValue(value, theSpanThongBao);
         }
@@ -61,8 +63,9 @@ function getValueSinhVien() {
     // thực hiện kiểm tra nếu isValid mang giá trị false thì return và không trả về sinhVien
     if (!isValid) {
         return;
+    } else {
+        return sinhVien;
     }
-    return sinhVien;
 }
 //đồng bộ dữ liệu
 function syncData() {
@@ -77,6 +80,10 @@ formQLSV.onsubmit = function (e) {
     console.log("Tôi ấn submit");
     //thực hiện chạy getValueSinhVien để lấy dữ liệu từ form
     let sv = getValueSinhVien();
+    if (!sv) {
+        return;
+    }
+    //  console.log(sv);
     arrSinhVien.push(sv);
     console.log(sv);
     //lưu dữ liệu vào localStorage
@@ -98,8 +105,6 @@ function renderSinhVien(arr = arrSinhVien) {
         Object.assign(newSv, sv);
         let { txtMaSV, txtEmail, txtTenSV, txtPass, txtNgaySinh, khSV } = newSv;
         let diemTB = newSv.tinhDiemTrungBinh();
-        console.log(newSv);
-        console.log(sv);
         content += `
         <tr>
                 <td>${txtMaSV}</td>
@@ -109,8 +114,8 @@ function renderSinhVien(arr = arrSinhVien) {
                  <td>${txtNgaySinh}</td>
                 <td>${khSV}</td>
                 <td>${diemTB.toFixed(2)}</td>
-                <td><button onclick="getInfoSinhVien('${txtMaSV.toString()}')" class="btn btn-warning">Sửa</button></td>
-                 <td><button onclick="deleteSinhVien('${txtMaSV.toString()}')" class="btn btn-danger">Xóa</button></td>
+                <td><button onclick="getInfoSinhVien('${txtMaSV}')" class="btn btn-warning">Sửa</button></td>
+                 <td><button onclick="deleteSinhVien('${txtMaSV}')" class="btn btn-danger">Xóa</button></td>
             </tr>
         `;
     }
@@ -136,77 +141,79 @@ function getLocalStorage(key = "arrSinhVien") {
 //find => item ==> undefinded
 //xóa sinh viên
 function deleteSinhVien(maSV) {
-    //tìm kiếm vị trí index
     let index = arrSinhVien.findIndex((sv) => sv.txtMaSV == maSV);
     if (index != -1) {
         arrSinhVien.splice(index, 1);
         syncData();
+        hienThiThongBao("Xóa sinh viên thành công", 2000, "bg-danger");
+        console.log("Xóa Mã SV: ", maSV);
     }
-    hienThiThongBao("Xóa sinh viên thành công", 2000, "bg-danger");
-    console.log("Xóa Mã SV: ", maSV);
 }
 
 //gọi sv truyền dữ liệu lên form
 function getInfoSinhVien(maSV) {
     let sv = arrSinhVien.find((sv) => sv.txtMaSV == maSV);
-    //trả về 1 cái object nếu tìm ra => gán về boolean nên kiểm tra là true hoặc false
-    //ko phải sv != undefinded
     if (sv) {
         let arrField = document.querySelectorAll(
             "#formQLSV input, #formQLSV select"
         );
         for (let tag of arrField) {
-            let { id } = tag; //txtMaSV
+            let { id } = tag;
             tag.value = sv[id];
-            //prevent action sửa MaSV
             if (id == "txtMaSV") {
                 tag.readOnly = true;
             }
         }
-        //  document.getElementById('txtMaSV').readOnly = true;
-
-        /* document.getElementById("txtMaSV").value = sv.txtMaSV;
-        document.getElementById("txtTenSV").value = sv.txtTenSV;
-        document.getElementById("txtEmail").value = sv.txtEmail;
-        document.getElementById("txtPass").value = sv.txtPass;
-        document.getElementById("txtNgaySinh").value = sv.txtNgaySinh;
-        document.getElementById("khSV").value = sv.khSV;*/
+        console.log("lấy lên Mã SV: ", maSV);
+    } else {
+        console.error(`Không tìm thấy sinh viên với mã: ${maSV}`);
     }
-    console.log("lấy lên Mã SV: ", maSV);
 }
+
 //update sinh viên
 function updateSinhVien() {
-    //lấy giá trị input maSV
-    let maSV = document.getElementById("txtMaSV").value;
-    let sv = arrSinhVien.find((sv) => sv.txtMaSV == maSV);
-    // let sinhVien = getValueSinhVien();
-    if (sv) {
-        let arrField = document.querySelectorAll(
-            "#formQLSV input, #formQLSV select"
-        );
-        for (let tag of arrField) {
-            //destructoring mảng input select từ form
-            let { id, value } = tag;
-            sv[id] = value;
-        }
+    // let maSV = document.getElementById("txtMaSV").value;
+    // let sv = arrSinhVien.find((sv) => sv.txtMaSV == maSV);
+    let sv = getValueSinhVien();
 
-        // sv.txtTenSV = document.getElementById("txtTenSV").value;
-        // sv.txtEmail = document.getElementById("txtEmail").value;
-        //  sv.txtPass = document.getElementById("txtPass").value;
-        //sv.txtNgaySinh = document.getElementById("txtNgaySinh").value;
-        //   sv.khSV = document.getElementById("khSV").value;
-        saveLocalStorage();
-        renderSinhVien();
-        formQLSV.reset();
-        document.getElementById("txtMaSV").readOnly = false;
-        console.log("update thành công");
-        hienThiThongBao("Cập nhật sinh viên thành công", 2000, "bg-warning");
-        console.log("Cập nhật Mã SV: ", maSV);
+    if (!sv) {
+        return;
     }
+
+    //tìm kiếm vị trí index của sv cần update trong mảng =. findIndex
+    let index = arrSinhVien.findIndex((item, index) => {
+        return item.txtMaSV == sv.txtMaSV; //gán kiểu boolean
+    });
+    if (index != -1) {
+        arrSinhVien[index] = sv;
+    }
+    saveLocalStorage();
+    renderSinhVien();
+    formQLSV.reset();
+    document.getElementById("txtMaSV").readOnly = false;
+    hienThiThongBao("Cập nhật sinh viên thành công", 2000, "bg-warning");
+    console.log("Cập nhật Mã SV: ", sv.txtMaSV);
+    // if (sv) {
+    //     let arrField = document.querySelectorAll(
+    //         "#formQLSV input, #formQLSV select"
+    //     );
+    //     for (let tag of arrField) {
+    //         let { id, value } = tag;
+    //         sv[id] = value;
+    //     }
+    //     saveLocalStorage();
+    //     renderSinhVien();
+    //     formQLSV.reset();
+    //     document.getElementById("txtMaSV").readOnly = false;
+    //     hienThiThongBao("Cập nhật sinh viên thành công", 2000, "bg-warning");
+    //     console.log("Cập nhật Mã SV: ", maSV);
+    // }
 }
 
-//truyền hàm ko cần () để ko bị tự chạy khi load trang, nếu có parameter thì bỏ vào hàm nặc danh
 document.getElementById("btnUpdate").addEventListener("click", updateSinhVien);
+
+//truyền hàm ko cần () để ko bị tự chạy khi load trang, nếu có parameter thì bỏ vào hàm nặc danh
+
 //document.getElementById("btnUpdate").onclick = updateSinhVien;
 document.getElementById("btnSearch").onclick = searchSinhVien;
 

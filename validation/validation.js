@@ -18,8 +18,8 @@ function checkEmptyValue(value, span) {
 // Kiểm tra độ dài ký tự của dữ liệu nhập vào
 // function xử lí kiểm tra độ dài tối thiểu và độ dài tối đa của dữ liệu nhập vào
 //
-function checkMinMaxValue(value, span, min, max) {
-    let doDaiKyTu = value.length; // "cát tường" ==>9
+function checkMinMaxValue(valueInput, span, min, max) {
+    let doDaiKyTu = valueInput.length; // "cát tường" ==>9
     if (doDaiKyTu >= min && doDaiKyTu <= max) {
         // trường hợp đúng
         span.innerHTML = "";
