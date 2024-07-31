@@ -38,7 +38,7 @@ function getValueSinhVien() {
         // Thực hiện validation dữ liệu người dùng
         // Thực hiện từ lệnh DOM đang có tới các input và select, sẽ sử dụng phương thức parentElement để DOM tới thẻ cha gần nhất
         let theCha = field.parentElement;
-        let theSpanThongBao = theCha.querySelector("span");
+        let theSpanThongBao = theCha.querySelector("span"); // gọi tới thẻ span trong thẻ cha chứa cả input và span
         // console.log(theCha.querySelector("span"));
 
         let isEmpty = checkEmptyValue(value, theSpanThongBao); // true false
@@ -54,7 +54,10 @@ function getValueSinhVien() {
         //   isValid &= checkEmailValue(value, theSpanThongBao);
         // }
         if (dataValidation == "doDai") {
-            isValid &= checkMinMaxValue(value, theSpanThongBao, 6, 15);
+            isValid &= checkMinMaxValue(value, theSpanThongBao, 6, 10);
+        }
+        if (dataValidation == "doDaiTen") {
+            isValid &= checkMinMaxValue(value, theSpanThongBao, 6, 25);
         } else if (dataValidation == "email") {
             isValid &= checkEmailValue(value, theSpanThongBao);
         }
@@ -67,17 +70,19 @@ function getValueSinhVien() {
         return sinhVien;
     }
 }
+
 //đồng bộ dữ liệu
 function syncData() {
     renderSinhVien();
     saveLocalStorage();
 }
+
 //thêm sinh viên
 let formQLSV = document.getElementById("formQLSV");
 
 formQLSV.onsubmit = function (e) {
     e.preventDefault();
-    console.log("Tôi ấn submit");
+
     //thực hiện chạy getValueSinhVien để lấy dữ liệu từ form
     let sv = getValueSinhVien();
     if (!sv) {
@@ -126,6 +131,7 @@ function renderSinhVien(arr = arrSinhVien) {
 function saveLocalStorage(key = "arrSinhVien", value = arrSinhVien) {
     localStorage.setItem(key, JSON.stringify(value));
 }
+
 //lấy dữ liệu từ local Storage
 function getLocalStorage(key = "arrSinhVien") {
     let dataLocal = localStorage.getItem(key);
